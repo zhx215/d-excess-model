@@ -24,21 +24,21 @@ tlcl <- vector() # condensation temperature, list
 dm <- c(seq(1.0,1.0,length.out=101)) # drop diameter (mm), list
 
 # fractionation functions
-a18_P_lv <- function(temp) {  # function for alpha of precipitation from vapor to liquid (or ice) phase (d18O) (>1)
+a18_P_lv <- function(temp) {  # function for alpha of precipitation from vapor to liquid phase (d18O) (>1)
   if (temp >= 273.15) {exp(1137/temp^2-0.4156/temp-0.00207)}
 }
-aD_P_lv <- function(temp){  # function for alpha of precipitation from vapor to liquid (or ice) phase (dD) (>1)
-  if (temp >= 273.15){exp(24844/temp^2-76.248/temp+0.05261)}
+aD_P_lv <- function(temp){  # function for alpha of precipitation from vapor to liquid phase (dD) (>1)
+  if (temp >= 273.15) {exp(24844/temp^2-76.248/temp+0.05261)}
 }
 
 # set up fractionation factors
 alpha <- aD <- alpha_reevap_18 <- alpha_reevap_D <- vector()
 for (i in 1:length(rh)){
   tlcl[i] <- lcl(101325,ts[i],rhl=rh[i])[2]
-  alpha[i] <- a18_P_lv(tlcl[i]) # equilibrium fractionation 18O, v-l, >1, condenstation, list
-  aD[i] <- aD_P_lv(tlcl[i]) # equilibrium fractionation D, v-l, >1, condenstation, list
+  alpha[i] <- a18_P_lv(tlcl[i]) # equilibrium fractionation 18O, >1, condenstation
+  aD[i] <- aD_P_lv(tlcl[i]) # equilibrium fractionation D, >1, condenstation
   if (raindrop==1) {
-    alpha_reevap_18[i] <- reevap(101325,ts[i],rh[i],dm[i],-12,-88)[2]
+    alpha_reevap_18[i] <- reevap(101325,ts[i],rh[i],dm[i],-12,-88)[2] # d18Ov = -12 permil; d2Hv = -88 permil; the "alpha" is not affected by vapor isotopic composition
     alpha_reevap_D[i] <- reevap(101325,ts[i],rh[i],dm[i],-12,-88)[3]
   } else {alpha_reevap_18[i] <- alpha_reevap_D[i] <- 1}
 }
@@ -95,7 +95,7 @@ craig_gordon <- function(t, ts, h, delta_precip, d18 = T){
     alphaD <- 1/aD_P_lv(ts)
     Re_D <- (1-t)*((alphaD*kD*rD_s)/(1-h+(1-t)*kD*h)) + t*rD_s*(1/(1+(1-t)*kD*(h/(1-h))))
     Re_D/rD_s}
-} 
+}
 # integrated E in permil
 isotope_e <- function(frac, delta_precip, ae){
   ((-((delta_precip+1000)*(1-frac)^(ae-1)-1000))*(1-frac)+delta_precip)/frac
@@ -129,12 +129,11 @@ dxs <- delta_d_p - 8*delta_p
 
 # plot
 colors = c("#CC79A7","#0072B2","#56B4E9","#009E73","#F0E442","#E69F00","#D55E00")
-#1
-plot(-999,-999,xlim=c(-12,-1.5),ylim=c(8,20),
-     xaxt="n",yaxt="n",xaxs="i",yaxs="i",xlab=expression(paste(delta^18,"O (","\u2030",")")),ylab=expression(paste("d-excess (","\u2030",")")),
-     cex.lab=1.1)
-axis(1,seq(-12,-2,2),cex.axis=1.1); axis(2,seq(8,20,2),cex.axis=1.1); title("Advection only, temperature gradient",
-                                                                            font.main=1,adj=0,cex.main=1.1)
+
+plot(-999,-999,xlim=c(-12,-1.5),ylim=c(8,20),xaxt="n",yaxt="n",xaxs="i",yaxs="i",
+     xlab=expression(paste(delta^18,"O (","\u2030",")")),ylab=expression(paste("d-excess (","\u2030",")")),cex.lab=1.1)
+axis(1,seq(-12,-2,2),cex.axis=1.1); axis(2,seq(8,20,2),cex.axis=1.1); title("Advection only, temperature gradient",font.main=1,adj=0,cex.main=1.1)
+
 for(j in 1:length(nd)){
   lines(delta_p[,j,2],dxs[,j,2],col=colors[j],lty=5,lwd=1)
   lines(delta_p[,j,6],dxs[,j,6],col=colors[j],lty=1,lwd=2)
