@@ -4,7 +4,7 @@
 setwd('C:\\Users\\Zhengyu\\Documents\\R\\github')
 source('lcl.R')
 reevap <- function(p0,temp0,rh0,D,d18Ov,d2Hv) {
-  # function for alpha of precipitation from vapor to liquid (or ice) phase (d18O) (>1) (Majoube, 1971)
+  # function for alpha of precipitation from vapor to liquid (or ice) phase (d18O) (>1) (Majoube, 1971a and 1971b)
   a18_P_lv <- function(temp) {
     if (temp >= 273.15) {exp(1137/temp^2-0.4156/temp-0.00207)}
     else if (temp < 253.15) {exp(11.839/temp-0.028224)}
@@ -15,7 +15,7 @@ reevap <- function(p0,temp0,rh0,D,d18Ov,d2Hv) {
     } 
   }
   
-  # function for alpha of precipitation from vapor to liquid (or ice) phase (dD) (>1) (Majoube, 1971)
+  # function for alpha of precipitation from vapor to liquid (or ice) phase (dD) (>1) (Majoube, 1971; Merlivat and Nief, 1967)
   aD_P_lv <- function(temp){
     if (temp >= 273.15){exp(24844/temp^2-76.248/temp+0.05261)}
     else if (temp < 253.15){exp(16289/temp^2-0.0945)}
